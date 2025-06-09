@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}控制面板 - AI聊天系统{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>欢迎，{{ session.username }}</h2>
+    
+    <div class="dashboard-section">
+        <h3>创建新会话</h3>
+        <div class="model-selector">
+            <button class="btn btn-primary" id="create-session-btn">选择模型创建会话</button>
+            <div class="model-list" id="model-list" style="display: none;">
+                <!-- 模型列表将通过JavaScript加载 -->
+            </div>
+        </div>
+    </div>
+    
+    <div class="dashboard-section">
+        <h3>您的会话</h3>
+        <div class="session-list">
+            {% if sessions %}
+                {% for session in sessions %}
+                <div class="session-card">
+                    <div class="session-info">
+                        <h4>{{ session.model_n }}</h4>
+                        <p>创建时间: {{ session.start_t }}</p>
+                    </div>
+                    <a href="{{ url_for('chat', session_id=session.session_id) }}" class="btn btn-secondary">进入对话</a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="empty-message">您还没有创建任何会话</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const createSessionBtn = document.getElementById('create-session-btn');
+        const modelList = document.getElementById('model-list');
+        
+        createSessionBtn.addEventListener('click', function() {
+            // 显示/隐藏模型列表
+            if (modelList.style.display === 'none') {
+                // 获取可用模型
+                fetch('/api/models')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.models) {
+                            modelList.innerHTML = '';
+                            data.models.forEach(model => {
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '{{ url_for('create_session') }}';
+                                
+                                const modelIdInput = document.createElement('input');
+                                modelIdInput.type = 'hidden';
+                                modelIdInput.name = 'model_id';
+                                modelIdInput.value = model.m_id;
+                                form.appendChild(modelIdInput);
+                                
+                                const modelNameInput = document.createElement('input');
+                                modelNameInput.type = 'hidden';
+                                modelNameInput.name = 'model_name';
+                                modelNameInput.value = model.m_name;
+                                form.appendChild(modelNameInput);
+                                
+                                const submitBtn = document.createElement('button');
+                                submitBtn.type = 'submit';
+                                submitBtn.className = 'model-option';
+                                submitBtn.innerHTML = `
+                                    <h4>${model.m_name}</h4>
+                                    <p>版本: ${model.version}</p>
+                                    <p>${model.describ}</p>
+                                `;
+                                form.appendChild(submitBtn);
+                                
+                                modelList.appendChild(form);
+                            });
+                            modelList.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('获取模型失败:', error));
+            } else {
+                modelList.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

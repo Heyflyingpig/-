@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero">
+    <h1>欢迎使用AI聊天系统</h1>
+    <p>您可以与不同的AI模型进行对话。</p>
+    {% if 'user_id' not in session %}
+    <div class="hero-buttons">
+        <a href="{{ url_for('login') }}" class="btn btn-primary">登录</a>
+        <a href="{{ url_for('register') }}" class="btn btn-secondary">注册</a>
+    </div>
+    {% else %}
+    <div class="hero-buttons">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">进入控制面板</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

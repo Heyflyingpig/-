@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI聊天系统 - 所有HTML模板</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .template {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        h2 {
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: #2c3e50;
+        }
+        
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .note {
+            background-color: #fff8dc;
+            padding: 10px;
+            border-left: 4px solid #ffd700;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI聊天系统 - HTML 模板代码</h1>
+    <p>以下是所有模板的HTML代码整合。实际使用时，这些模板应分开存储在templates目录下</p>
+    
+    <div class="template">
+        <h2>base.html - 基础模板</h2>
+        <div class="note">这是所有其他模板的基础，定义了共同的页面结构</div>
+        <pre>
+&lt;!DOCTYPE html&gt;
+&lt;html lang="zh"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;{% block title %}AI聊天系统{% endblock %}&lt;/title&gt;
+    &lt;link rel="stylesheet" href="{{ url_for('static', filename='css/static.css') }}"&gt;
+    {% block head %}{% endblock %}
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;nav class="navbar"&gt;
+        &lt;div class="navbar-brand"&gt;AI聊天系统&lt;/div&gt;
+        &lt;div class="navbar-menu"&gt;
+            {% if 'user_id' in session %}
+            &lt;a href="{{ url_for('dashboard') }}"&gt;控制面板&lt;/a&gt;
+            &lt;a href="{{ url_for('logout') }}"&gt;登出&lt;/a&gt;
+            {% else %}
+            &lt;a href="{{ url_for('login') }}"&gt;登录&lt;/a&gt;
+            &lt;a href="{{ url_for('register') }}"&gt;注册&lt;/a&gt;
+            {% endif %}
+        &lt;/div&gt;
+    &lt;/nav&gt;
+    
+    &lt;div class="container"&gt;
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    &lt;div class="alert alert-{{ category }}"&gt;{{ message }}&lt;/div&gt;
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    &lt;/div&gt;
+    
+    &lt;script src="{{ url_for('static', filename='js/static.js') }}"&gt;&lt;/script&gt;
+    {% block scripts %}{% endblock %}
+&lt;/body&gt;
+&lt;/html&gt;
+        </pre>
+    </div>
+    
+    <div class="template">
+        <h2>index.html - 主页</h2>
+        <div class="note">网站的首页，引导用户登录或进入控制面板</div>
+        <pre>
+{% extends 'base.html' %}
+
+{% block content %}
+&lt;div class="hero"&gt;
+    &lt;h1&gt;欢迎使用AI聊天系统&lt;/h1&gt;
+    &lt;p&gt;这是一个简单的AI对话应用，您可以与不同的AI模型进行对话。&lt;/p&gt;
+    {% if 'user_id' not in session %}
+    &lt;div class="hero-buttons"&gt;
+        &lt;a href="{{ url_for('login') }}" class="btn btn-primary"&gt;登录&lt;/a&gt;
+        &lt;a href="{{ url_for('register') }}" class="btn btn-secondary"&gt;注册&lt;/a&gt;
+    &lt;/div&gt;
+    {% else %}
+    &lt;div class="hero-buttons"&gt;
+        &lt;a href="{{ url_for('dashboard') }}" class="btn btn-primary"&gt;进入控制面板&lt;/a&gt;
+    &lt;/div&gt;
+    {% endif %}
+&lt;/div&gt;
+{% endblock %}
+        </pre>
+    </div>
+    
+    <div class="template">
+        <h2>login.html - 登录页面</h2>
+        <div class="note">用户登录表单</div>
+        <pre>
+{% extends 'base.html' %}
+
+{% block title %}登录 - AI聊天系统{% endblock %}
+
+{% block content %}
+&lt;div class="auth-form"&gt;
+    &lt;h2&gt;用户登录&lt;/h2&gt;
+    &lt;form method="post" action="{{ url_for('login') }}"&gt;
+        &lt;div class="form-group"&gt;
+            &lt;label for="email"&gt;邮箱&lt;/label&gt;
+            &lt;input type="email" id="email" name="email" required&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+            &lt;label for="password"&gt;密码&lt;/label&gt;
+            &lt;input type="password" id="password" name="password" required&gt;
+        &lt;/div&gt;
+        &lt;button type="submit" class="btn btn-primary"&gt;登录&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p&gt;还没有账号？&lt;a href="{{ url_for('register') }}"&gt;注册&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+{% endblock %}
+        </pre>
+    </div>
+    
+    <div class="template">
+        <h2>register.html - 注册页面</h2>
+        <div class="note">新用户注册表单</div>
+        <pre>
+{% extends 'base.html' %}
+
+{% block title %}注册 - AI聊天系统{% endblock %}
+
+{% block content %}
+&lt;div class="auth-form"&gt;
+    &lt;h2&gt;用户注册&lt;/h2&gt;
+    &lt;form method="post" action="{{ url_for('register') }}"&gt;
+        &lt;div class="form-group"&gt;
+            &lt;label for="username"&gt;用户名&lt;/label&gt;
+            &lt;input type="text" id="username" name="username" required&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+            &lt;label for="email"&gt;邮箱&lt;/label&gt;
+            &lt;input type="email" id="email" name="email" required&gt;
+        &lt;/div&gt;
+        &lt;div class="form-group"&gt;
+            &lt;label for="password"&gt;密码&lt;/label&gt;
+            &lt;input type="password" id="password" name="password" required&gt;
+        &lt;/div&gt;
+        &lt;button type="submit" class="btn btn-primary"&gt;注册&lt;/button&gt;
+    &lt;/form&gt;
+    &lt;p&gt;已有账号？&lt;a href="{{ url_for('login') }}"&gt;登录&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+{% endblock %}
+        </pre>
+    </div>
+    
+    <div class="template">
+        <h2>dashboard.html - 控制面板</h2>
+        <div class="note">用户控制面板，显示用户会话和创建新会话的选项</div>
+        <pre>
+{% extends 'base.html' %}
+
+{% block title %}控制面板 - AI聊天系统{% endblock %}
+
+{% block content %}
+&lt;div class="dashboard"&gt;
+    &lt;h2&gt;欢迎，{{ session.username }}&lt;/h2&gt;
+    
+    &lt;div class="dashboard-section"&gt;
+        &lt;h3&gt;创建新会话&lt;/h3&gt;
+        &lt;div class="model-selector"&gt;
+            &lt;button class="btn btn-primary" id="create-session-btn"&gt;选择模型创建会话&lt;/button&gt;
+            &lt;div class="model-list" id="model-list" style="display: none;"&gt;
+                &lt;!-- 模型列表将通过JavaScript加载 --&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="dashboard-section"&gt;
+        &lt;h3&gt;您的会话&lt;/h3&gt;
+        &lt;div class="session-list"&gt;
+            {% if sessions %}
+                {% for session in sessions %}
+                &lt;div class="session-card"&gt;
+                    &lt;div class="session-info"&gt;
+                        &lt;h4&gt;{{ session.model_n }}&lt;/h4&gt;
+                        &lt;p&gt;创建时间: {{ session.start_t }}&lt;/p&gt;
+                    &lt;/div&gt;
+                    &lt;a href="{{ url_for('chat', session_id=session.session_id) }}" class="btn btn-secondary"&gt;进入对话&lt;/a&gt;
+                &lt;/div&gt;
+                {% endfor %}
+            {% else %}
+                &lt;p class="empty-message"&gt;您还没有创建任何会话&lt;/p&gt;
+            {% endif %}
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}
+
+{% block scripts %}
+&lt;script&gt;
+    document.addEventListener('DOMContentLoaded', function() {
+        const createSessionBtn = document.getElementById('create-session-btn');
+        const modelList = document.getElementById('model-list');
+        
+        createSessionBtn.addEventListener('click', function() {
+            // 显示/隐藏模型列表
+            if (modelList.style.display === 'none') {
+                // 获取可用模型
+                fetch('/api/models')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.models) {
+                            modelList.innerHTML = '';
+                            data.models.forEach(model => {
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = '{{ url_for('create_session') }}';
+                                
+                                const modelIdInput = document.createElement('input');
+                                modelIdInput.type = 'hidden';
+                                modelIdInput.name = 'model_id';
+                                modelIdInput.value = model.m_id;
+                                form.appendChild(modelIdInput);
+                                
+                                const modelNameInput = document.createElement('input');
+                                modelNameInput.type = 'hidden';
+                                modelNameInput.name = 'model_name';
+                                modelNameInput.value = model.m_name;
+                                form.appendChild(modelNameInput);
+                                
+                                const submitBtn = document.createElement('button');
+                                submitBtn.type = 'submit';
+                                submitBtn.className = 'model-option';
+                                submitBtn.innerHTML = `
+                                    &lt;h4&gt;${model.m_name}&lt;/h4&gt;
+                                    &lt;p&gt;版本: ${model.version}&lt;/p&gt;
+                                    &lt;p&gt;${model.describ}&lt;/p&gt;
+                                `;
+                                form.appendChild(submitBtn);
+                                
+                                modelList.appendChild(form);
+                            });
+                            modelList.style.display = 'block';
+                        }
+                    })
+                    .catch(error => console.error('获取模型失败:', error));
+            } else {
+                modelList.style.display = 'none';
+            }
+        });
+    });
+&lt;/script&gt;
+{% endblock %}
+        </pre>
+    </div>
+    
+    <div class="template">
+        <h2>chat.html - 聊天页面</h2>
+        <div class="note">聊天界面，用于用户与AI模型的交互</div>
+        <pre>
+{% extends 'base.html' %}
+
+{% block title %}聊天 - AI聊天系统{% endblock %}
+
+{% block content %}
+&lt;div class="chat-container"&gt;
+    &lt;div class="chat-header"&gt;
+        &lt;h2&gt;{{ session_data.model_n }}&lt;/h2&gt;
+        &lt;p&gt;模型: {{ model.m_name }} ({{ model.version }})&lt;/p&gt;
+        &lt;a href="{{ url_for('dashboard') }}" class="btn btn-secondary"&gt;返回控制面板&lt;/a&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="chat-messages" id="chat-messages"&gt;
+        {% for message in messages %}
+        &lt;div class="message-container"&gt;
+            &lt;div class="message user-message"&gt;
+                &lt;div class="message-content"&gt;{{ message.u_input }}&lt;/div&gt;
+                &lt;div class="message-time"&gt;{{ message.time }}&lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class="message ai-message"&gt;
+                &lt;div class="message-content"&gt;{{ message.ai_respond }}&lt;/div&gt;
+                &lt;div class="message-time"&gt;{{ message.time }}&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        {% endfor %}
+    &lt;/div&gt;
+    
+    &lt;div class="chat-input"&gt;
+        &lt;textarea id="user-input" placeholder="输入消息..."&gt;&lt;/textarea&gt;
+        &lt;button id="send-btn" class="btn btn-primary"&gt;发送&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+{% endblock %}
+
+{% block scripts %}
+&lt;script&gt;
+    const sessionId = {{ session_data.session_id }};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        // 滚动到最新消息
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // 发送消息
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // 清空输入框
+            userInput.value = '';
+            
+            // 添加用户消息到界面
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
+            
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.innerHTML = `
+                &lt;div class="message-content"&gt;${message}&lt;/div&gt;
+                &lt;div class="message-time"&gt;刚刚&lt;/div&gt;
+            `;
+            messageContainer.appendChild(userMessageDiv);
+            
+            chatMessages.appendChild(messageContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 发送到服务器
+            fetch('/api/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    session_id: sessionId
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 添加AI回复到界面
+                    const aiMessageDiv = document.createElement('div');
+                    aiMessageDiv.className = 'message ai-message';
+                    aiMessageDiv.innerHTML = `
+                        &lt;div class="message-content"&gt;${data.message}&lt;/div&gt;
+                        &lt;div class="message-time"&gt;${data.timestamp}&lt;/div&gt;
+                    `;
+                    messageContainer.appendChild(aiMessageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    alert('发送消息失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('发送消息出错:', error);
+                alert('发送消息时出现错误');
+            });
+        }
+    });
+&lt;/script&gt;
+{% endblock %}
+        </pre>
+    </div>
+</body>
+</html>

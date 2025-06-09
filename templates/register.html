@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}注册 - AI聊天系统{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h2>用户注册</h2>
+    <form method="post" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="email">邮箱</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">注册</button>
+    </form>
+    <p>已有账号？<a href="{{ url_for('login') }}">登录</a></p>
+</div>
+{% endblock %}
+        

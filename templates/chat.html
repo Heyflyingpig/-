@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}聊天 - AI聊天系统{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <div class="chat-header">
+        <h2>{{ session_data.model_n }}</h2>
+        <p>模型: {{ model.m_name }} ({{ model.version }})</p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">返回控制面板</a>
+    </div>
+    
+    <div class="chat-messages" id="chat-messages">
+        {% for message in messages %}
+        <div class="message-container">
+            <div class="message user-message">
+                <div class="message-content">{{ message.u_input }}</div>
+                <div class="message-time">{{ message.time }}</div>
+            </div>
+            <div class="message ai-message">
+                <div class="message-content">{{ message.ai_respond }}</div>
+                <div class="message-time">{{ message.time }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="chat-input">
+        <textarea id="user-input" placeholder="输入消息..."></textarea>
+        <button id="send-btn" class="btn btn-primary">发送</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const sessionId = {{ session_data.session_id }};
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        // 滚动到最新消息
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        
+        // 发送消息
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            // 清空输入框
+            userInput.value = '';
+            
+            // 添加用户消息到界面
+            const messageContainer = document.createElement('div');
+            messageContainer.className = 'message-container';
+            
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.innerHTML = `
+                <div class="message-content">${message}</div>
+                <div class="message-time">刚刚</div>
+            `;
+            messageContainer.appendChild(userMessageDiv);
+            
+            chatMessages.appendChild(messageContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 发送到服务器
+            fetch('/api/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    session_id: sessionId
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 添加AI回复到界面
+                    const aiMessageDiv = document.createElement('div');
+                    aiMessageDiv.className = 'message ai-message';
+                    aiMessageDiv.innerHTML = `
+                        <div class="message-content">${data.message}</div>
+                        <div class="message-time">${data.timestamp}</div>
+                    `;
+                    messageContainer.appendChild(aiMessageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    alert('发送消息失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('发送消息出错:', error);
+                alert('发送消息时出现错误');
+            });
+        }
+    });
+</script>
+{% endblock %}
